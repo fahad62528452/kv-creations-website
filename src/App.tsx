@@ -214,7 +214,7 @@ function Story() {
               <img
                 src="/images/story.jpg"
                 alt="Bride in traditional South Indian bridal attire by an arched window"
-                className="aspect-[4/5] w-full object-cover object-bottom md:aspect-[3/4]"
+                className="aspect-[5/6] w-full max-h-[34rem] object-cover object-bottom md:aspect-[4/5] md:max-h-[36rem]"
               />
               <div className="absolute inset-0 ring-1 ring-inset ring-gold/20" />
             </div>
@@ -356,45 +356,109 @@ const steps = [
     num: '01',
     title: 'Discovery',
     copy: 'We listen for the tone of the day: guest list, rituals, venues, and the feeling you want people to leave with.',
+    image: '/images/portfolio/ABI_3950.jpg',
+    alt: 'Candid bridal moment during early celebration energy',
+    cue: 'Listen',
   },
   {
     num: '02',
     title: 'Design',
     copy: 'Mood, florals, lighting, and flow become a clear plan. Every choice earns its place in the room.',
+    image: '/images/portfolio/2WV06243.jpg',
+    alt: 'Floral and gold frame backdrop design',
+    cue: 'Compose',
   },
   {
     num: '03',
     title: 'Production',
     copy: 'Vendors, timing, and guest experience are directed on the ground so you can be present.',
+    image: '/images/portfolio/2WV07722.jpg',
+    alt: 'Petal shower during live wedding ceremony',
+    cue: 'Direct',
   },
 ]
 
 function Process() {
   return (
     <section id="process" className="relative overflow-hidden bg-maroon px-5 py-24 md:px-10 md:py-36">
-      <div className="pointer-events-none absolute -right-24 top-10 h-72 w-72 rounded-full bg-gold/10 blur-3xl" />
+      <div className="pointer-events-none absolute -left-32 top-1/4 h-96 w-96 rounded-full bg-gold/[0.07] blur-3xl" />
+      <div className="pointer-events-none absolute -right-24 bottom-10 h-72 w-72 rounded-full bg-maroon-core/50 blur-3xl" />
+
       <div className="mx-auto max-w-[1400px]">
-        <Reveal>
-          <h2 className="max-w-[14ch] font-[family-name:var(--font-display)] text-[clamp(2rem,4vw,3.4rem)] font-medium leading-[1.1] text-ivory">
-            From first conversation to final cue
-          </h2>
-        </Reveal>
-        <ol className="mt-16 grid gap-12 md:grid-cols-3 md:gap-8">
-          {steps.map((step, index) => (
-            <li key={step.num}>
-              <Reveal delay={index * 0.08}>
-                <p className="font-[family-name:var(--font-display)] text-5xl font-medium text-gold/35 md:text-6xl">
-                  {step.num}
-                </p>
-                <h3 className="mt-4 font-[family-name:var(--font-display)] text-xl font-medium text-ivory md:text-2xl">
-                  {step.title}
-                </h3>
-                <p className="mt-3 max-w-[34ch] text-sm font-light leading-relaxed text-ivory-muted md:text-base">
-                  {step.copy}
-                </p>
-              </Reveal>
-            </li>
-          ))}
+        <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+          <Reveal>
+            <h2 className="max-w-[14ch] font-[family-name:var(--font-display)] text-[clamp(2rem,4vw,3.4rem)] font-medium leading-[1.1] text-ivory">
+              From first conversation to final cue
+            </h2>
+          </Reveal>
+          <Reveal delay={0.08}>
+            <p className="max-w-[28ch] font-[family-name:var(--font-body)] text-sm font-light leading-relaxed text-ivory-muted md:text-right">
+              A quiet path from listening to the live room. Three movements, one celebration.
+            </p>
+          </Reveal>
+        </div>
+
+        <ol className="relative mt-16 md:mt-24">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute bottom-0 left-4 top-0 w-px bg-gradient-to-b from-transparent via-gold/40 to-transparent md:left-1/2 md:-translate-x-px"
+          />
+
+          {steps.map((step, index) => {
+            const flip = index % 2 === 1
+            return (
+              <li key={step.num} className="relative py-10 md:py-14">
+                <span
+                  aria-hidden
+                  className="absolute left-4 top-14 z-10 flex h-3 w-3 -translate-x-1/2 items-center justify-center md:left-1/2 md:top-1/2 md:-translate-y-1/2"
+                >
+                  <span className="absolute h-3 w-3 rounded-full bg-gold/30" />
+                  <span className="relative h-1.5 w-1.5 rounded-full bg-gold" />
+                </span>
+
+                <div className="grid items-center gap-8 pl-10 md:grid-cols-2 md:gap-16 md:pl-0">
+                  <Reveal
+                    delay={index * 0.06}
+                    className={flip ? 'md:order-2' : 'md:order-1'}
+                  >
+                    <div className="group relative overflow-hidden">
+                      <img
+                        src={step.image}
+                        alt={step.alt}
+                        className="aspect-[4/5] w-full object-cover transition-transform duration-700 group-hover:scale-[1.03] md:aspect-[5/6]"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-maroon-core/55 via-transparent to-transparent" />
+                      <p className="absolute bottom-4 left-4 font-[family-name:var(--font-body)] text-[10px] font-light uppercase tracking-[0.35em] text-gold">
+                        {step.cue}
+                      </p>
+                    </div>
+                  </Reveal>
+
+                  <Reveal
+                    delay={0.08 + index * 0.06}
+                    className={flip ? 'md:order-1 md:text-right' : 'md:order-2'}
+                  >
+                    <div className={flip ? 'md:ml-auto md:max-w-[34ch]' : 'md:max-w-[34ch]'}>
+                      <p className="font-[family-name:var(--font-display)] text-6xl font-medium leading-none text-gold/25 md:text-7xl">
+                        {step.num}
+                      </p>
+                      <h3 className="mt-3 font-[family-name:var(--font-display)] text-2xl font-medium tracking-tight text-ivory md:text-3xl">
+                        {step.title}
+                      </h3>
+                      <p className="mt-4 text-sm font-light leading-relaxed text-ivory-muted md:text-base">
+                        {step.copy}
+                      </p>
+                      <div
+                        className={`mt-6 h-px w-16 bg-gold/40 ${flip ? 'md:ml-auto' : ''}`}
+                        aria-hidden
+                      />
+                    </div>
+                  </Reveal>
+                </div>
+              </li>
+            )
+          })}
         </ol>
       </div>
     </section>
