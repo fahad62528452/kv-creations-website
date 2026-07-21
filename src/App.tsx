@@ -1,4 +1,5 @@
 import { useEffect, useRef, type FormEvent, type ReactNode } from 'react'
+import { Link } from 'react-router-dom'
 import {
   motion,
   useMotionTemplate,
@@ -620,6 +621,12 @@ function Footer() {
           >
             hello@kvcreations.com
           </a>
+          <Link
+            to="/privacy"
+            className="text-xs font-light uppercase tracking-[0.22em] text-ivory-muted/80 transition-colors hover:text-gold"
+          >
+            Privacy Policy
+          </Link>
           <p className="text-xs font-light uppercase tracking-[0.22em] text-ivory-muted/60">
             © {new Date().getFullYear()} KV Creations
           </p>
