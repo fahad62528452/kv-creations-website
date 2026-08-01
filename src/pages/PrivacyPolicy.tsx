@@ -46,54 +46,54 @@ const sections = [
 export default function PrivacyPolicy() {
   return (
     <>
-      <header className="fixed inset-x-0 top-0 z-40 border-b border-gold/10 bg-maroon-core/90 backdrop-blur-sm">
+      <header className="fixed inset-x-0 top-0 z-40 border-b border-bronze/10 bg-paper/90 backdrop-blur-sm">
         <div className="mx-auto flex h-16 max-w-[900px] items-center justify-between px-5 md:h-20 md:px-10">
           <Link
             to="/"
-            className="font-[family-name:var(--font-display)] text-[13px] font-medium tracking-[0.35em] text-ivory transition-colors duration-300 hover:text-gold md:text-sm"
+            className="font-[family-name:var(--font-display)] text-[13px] font-medium tracking-[0.35em] text-ink transition-colors duration-300 hover:text-bronze md:text-sm"
           >
             KV CREATIONS
           </Link>
           <Link
             to="/"
-            className="font-[family-name:var(--font-body)] text-[11px] font-light uppercase tracking-[0.28em] text-gold transition-colors hover:text-gold-bright"
+            className="font-[family-name:var(--font-body)] text-[11px] font-light uppercase tracking-[0.28em] text-bronze transition-colors hover:text-bronze-bright"
           >
             Back home
           </Link>
         </div>
       </header>
 
-      <main className="bg-maroon-core px-5 pb-24 pt-28 md:px-10 md:pb-36 md:pt-36">
+      <main className="bg-paper px-5 pb-24 pt-28 md:px-10 md:pb-36 md:pt-36">
         <article className="mx-auto max-w-[720px]">
-          <p className="font-[family-name:var(--font-body)] text-[11px] font-light uppercase tracking-[0.28em] text-gold">
+          <p className="font-[family-name:var(--font-body)] text-[11px] font-light uppercase tracking-[0.28em] text-bronze">
             Legal
           </p>
-          <h1 className="mt-4 font-[family-name:var(--font-display)] text-[clamp(2rem,4vw,3.2rem)] font-medium leading-[1.1] text-ivory">
+          <h1 className="mt-4 font-[family-name:var(--font-display)] text-[clamp(2rem,4vw,3.2rem)] font-medium leading-[1.1] text-ink">
             Privacy Policy
           </h1>
-          <p className="mt-4 text-sm font-light text-ivory-muted">
+          <p className="mt-4 text-sm font-light text-ink-muted">
             Last updated: July 21, 2026
           </p>
 
           <div className="mt-14 space-y-10">
             {sections.map((section) => (
               <section key={section.title}>
-                <h2 className="font-[family-name:var(--font-display)] text-xl font-medium text-ivory md:text-2xl">
+                <h2 className="font-[family-name:var(--font-display)] text-xl font-medium text-ink md:text-2xl">
                   {section.title}
                 </h2>
-                <p className="mt-3 text-base font-light leading-relaxed text-ivory-muted">
+                <p className="mt-3 text-base font-light leading-relaxed text-ink-muted">
                   {section.body}
                 </p>
               </section>
             ))}
           </div>
 
-          <div className="mt-16 border-t border-gold/20 pt-8">
+          <div className="mt-16 border-t border-bronze/20 pt-8">
             <Link
               to="/"
-              className="inline-flex items-center gap-3 font-[family-name:var(--font-body)] text-[12px] font-light uppercase tracking-[0.32em] text-gold transition-colors hover:text-gold-bright"
+              className="inline-flex items-center gap-3 font-[family-name:var(--font-body)] text-[12px] font-light uppercase tracking-[0.32em] text-bronze transition-colors hover:text-bronze-bright"
             >
-              <span className="border-b border-gold/50 pb-1">Return to KV Creations</span>
+              <span className="border-b border-bronze/50 pb-1">Return to KV Creations</span>
               <span aria-hidden>→</span>
             </Link>
           </div>
