@@ -10,6 +10,22 @@ import {
 } from 'framer-motion'
 import Lenis from 'lenis'
 
+function useIsMobile(query = '(max-width: 767px)') {
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== 'undefined' ? window.matchMedia(query).matches : false,
+  )
+
+  useEffect(() => {
+    const media = window.matchMedia(query)
+    const update = () => setIsMobile(media.matches)
+    update()
+    media.addEventListener('change', update)
+    return () => media.removeEventListener('change', update)
+  }, [query])
+
+  return isMobile
+}
+
 function useSmoothScroll() {
   const reduce = useReducedMotion()
 
@@ -71,22 +87,38 @@ function Reveal({
   )
 }
 
+const navLinks = [
+  ['Story', '#story'],
+  ['Atelier', '#atelier'],
+  ['Gallery', '#gallery'],
+  ['Process', '#process'],
+] as const
+
 function Nav() {
+  const [open, setOpen] = useState(false)
+
+  useEffect(() => {
+    document.body.style.overflow = open ? 'hidden' : ''
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [open])
+
   return (
     <header className="fixed inset-x-0 top-0 z-40 border-b border-bronze/10 bg-paper/85 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-[1400px] items-center justify-between px-5 md:h-20 md:px-10">
-        <a href="#top" className="group flex items-center gap-3" aria-label="KV Creations home">
-          <span className="font-[family-name:var(--font-display)] text-[13px] font-medium tracking-[0.35em] text-ink transition-colors duration-300 group-hover:text-bronze md:text-sm">
+        <a
+          href="#top"
+          className="group flex items-center gap-3"
+          aria-label="KV Creations home"
+          onClick={() => setOpen(false)}
+        >
+          <span className="font-[family-name:var(--font-display)] text-[12px] font-medium tracking-[0.28em] text-ink transition-colors duration-300 group-hover:text-bronze sm:text-[13px] sm:tracking-[0.35em] md:text-sm">
             KV CREATIONS
           </span>
         </a>
         <nav className="hidden items-center gap-9 md:flex" aria-label="Primary">
-          {[
-            ['Story', '#story'],
-            ['Atelier', '#atelier'],
-            ['Gallery', '#gallery'],
-            ['Process', '#process'],
-          ].map(([label, href]) => (
+          {navLinks.map(([label, href]) => (
             <a
               key={href}
               href={href}
@@ -96,13 +128,71 @@ function Nav() {
             </a>
           ))}
         </nav>
-        <a
-          href="#inquire"
-          className="font-[family-name:var(--font-body)] text-[11px] font-light uppercase tracking-[0.28em] text-bronze transition-colors duration-300 hover:text-bronze-bright"
-        >
-          Inquire
-        </a>
+        <div className="flex items-center gap-4">
+          <a
+            href="#inquire"
+            className="font-[family-name:var(--font-body)] text-[11px] font-light uppercase tracking-[0.28em] text-bronze transition-colors duration-300 hover:text-bronze-bright"
+            onClick={() => setOpen(false)}
+          >
+            Inquire
+          </a>
+          <button
+            type="button"
+            className="flex h-10 w-10 items-center justify-center text-ink md:hidden"
+            aria-expanded={open}
+            aria-controls="mobile-nav"
+            aria-label={open ? 'Close menu' : 'Open menu'}
+            onClick={() => setOpen((current) => !current)}
+          >
+            <span className="sr-only">{open ? 'Close' : 'Menu'}</span>
+            <span className="relative block h-3.5 w-5" aria-hidden>
+              <span
+                className={`absolute left-0 top-0 h-px w-full bg-ink transition-transform duration-200 ${
+                  open ? 'translate-y-[7px] rotate-45' : ''
+                }`}
+              />
+              <span
+                className={`absolute left-0 top-[7px] h-px w-full bg-ink transition-opacity duration-200 ${
+                  open ? 'opacity-0' : 'opacity-100'
+                }`}
+              />
+              <span
+                className={`absolute left-0 top-[14px] h-px w-full bg-ink transition-transform duration-200 ${
+                  open ? '-translate-y-[7px] -rotate-45' : ''
+                }`}
+              />
+            </span>
+          </button>
+        </div>
       </div>
+
+      <AnimatePresence>
+        {open && (
+          <motion.nav
+            id="mobile-nav"
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.2 }}
+            className="border-t border-bronze/10 bg-paper px-5 py-6 md:hidden"
+            aria-label="Mobile"
+          >
+            <ul className="space-y-1">
+              {navLinks.map(([label, href]) => (
+                <li key={href}>
+                  <a
+                    href={href}
+                    className="block py-3 font-[family-name:var(--font-body)] text-sm font-light uppercase tracking-[0.24em] text-ink-muted transition-colors hover:text-bronze"
+                    onClick={() => setOpen(false)}
+                  >
+                    {label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </motion.nav>
+        )}
+      </AnimatePresence>
     </header>
   )
 }
@@ -146,16 +236,16 @@ function Hero() {
             <img
               src="/logo/logo-hero.png"
               alt="KV Creations"
-              className="mb-5 h-[8.5rem] w-auto drop-shadow-[0_12px_40px_rgba(0,0,0,0.55)] md:mb-7 md:h-44 lg:h-48"
+              className="mb-4 h-24 w-auto drop-shadow-[0_12px_40px_rgba(0,0,0,0.55)] sm:mb-5 sm:h-[7.5rem] md:mb-7 md:h-44 lg:h-48"
             />
           </Reveal>
           <Reveal delay={0.08}>
-            <h1 className="max-w-[18ch] font-[family-name:var(--font-display)] text-[clamp(1.9rem,4.8vw,4rem)] font-medium leading-[1.1] tracking-tight text-paper drop-shadow-[0_2px_18px_rgba(0,0,0,0.45)]">
+            <h1 className="max-w-[18ch] font-[family-name:var(--font-display)] text-[clamp(1.65rem,6.2vw,4rem)] font-medium leading-[1.12] tracking-tight text-paper drop-shadow-[0_2px_18px_rgba(0,0,0,0.45)]">
               Creating the vibe that turns occasions into experiences
             </h1>
           </Reveal>
           <Reveal delay={0.14}>
-            <p className="mt-5 max-w-[38ch] font-[family-name:var(--font-body)] text-base font-normal leading-relaxed text-paper drop-shadow-[0_2px_12px_rgba(0,0,0,0.5)] md:text-lg">
+            <p className="mt-4 max-w-[38ch] font-[family-name:var(--font-body)] text-sm font-normal leading-relaxed text-paper drop-shadow-[0_2px_12px_rgba(0,0,0,0.5)] sm:mt-5 sm:text-base md:text-lg">
               Wedding planning and event production for celebrations that feel lived-in, luminous, and entirely your own.
             </p>
           </Reveal>
@@ -172,7 +262,7 @@ function BeginStoryLink() {
   return (
     <a
       href="#inquire"
-      className="group mt-9 inline-flex items-center gap-3 border border-white/80 bg-scrim/35 px-6 py-3.5 font-[family-name:var(--font-body)] text-[12px] font-medium uppercase tracking-[0.28em] text-white shadow-[0_8px_28px_rgba(0,0,0,0.35)] backdrop-blur-sm transition-[background-color,border-color] duration-300 hover:border-white hover:bg-scrim/50"
+      className="group mt-7 inline-flex max-w-full items-center gap-2 border border-white/80 bg-scrim/35 px-4 py-3 font-[family-name:var(--font-body)] text-[11px] font-medium uppercase tracking-[0.22em] text-white shadow-[0_8px_28px_rgba(0,0,0,0.35)] backdrop-blur-sm transition-[background-color,border-color] duration-300 hover:border-white hover:bg-scrim/50 sm:mt-9 sm:gap-3 sm:px-6 sm:py-3.5 sm:text-[12px] sm:tracking-[0.28em]"
     >
       <span>Begin your story</span>
       <span aria-hidden className="inline-block transition-transform duration-300 group-hover:translate-x-1">
@@ -238,8 +328,46 @@ const services = [
   },
 ]
 
+function AtelierStacked() {
+  return (
+    <section id="atelier" className="bg-paper-deep px-5 py-20 sm:py-24 md:px-10 md:py-36">
+      <div className="mx-auto max-w-[1400px]">
+        <h2 className="max-w-[16ch] font-[family-name:var(--font-display)] text-[clamp(1.85rem,5vw,3.4rem)] font-medium leading-[1.1] text-ink">
+          What we produce
+        </h2>
+        <div className="mt-10 divide-y divide-bronze/20 border-y border-bronze/20 sm:mt-14">
+          {services.map((service) => (
+            <article
+              key={service.title}
+              className="grid gap-6 py-8 sm:gap-8 sm:py-10 md:grid-cols-12 md:items-center md:gap-10"
+            >
+              <div className="md:col-span-5 lg:col-span-4">
+                <img
+                  src={service.image}
+                  alt=""
+                  className="aspect-[4/3] w-full object-cover"
+                />
+              </div>
+              <div className="md:col-span-7 lg:col-span-8">
+                <h3 className="font-[family-name:var(--font-display)] text-xl font-medium tracking-tight text-ink sm:text-2xl md:text-3xl">
+                  {service.title}
+                </h3>
+                <p className="mt-3 max-w-[48ch] text-sm font-light leading-relaxed text-ink-muted sm:mt-4 sm:text-base">
+                  {service.copy}
+                </p>
+              </div>
+            </article>
+          ))}
+        </div>
+        <FramedInquire />
+      </div>
+    </section>
+  )
+}
+
 function Atelier() {
   const reduce = useReducedMotion()
+  const isMobile = useIsMobile()
   const sectionRef = useRef<HTMLElement>(null)
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -252,41 +380,8 @@ function Atelier() {
   )
   const progressWidth = useTransform(scrollYProgress, [0, 1], ['0%', '100%'])
 
-  if (reduce) {
-    return (
-      <section id="atelier" className="bg-paper-deep px-5 py-24 md:px-10 md:py-36">
-        <div className="mx-auto max-w-[1400px]">
-          <h2 className="max-w-[16ch] font-[family-name:var(--font-display)] text-[clamp(2rem,4vw,3.4rem)] font-medium leading-[1.1] text-ink">
-            What we produce
-          </h2>
-          <div className="mt-14 divide-y divide-bronze/20 border-y border-bronze/20">
-            {services.map((service) => (
-              <article
-                key={service.title}
-                className="grid gap-8 py-10 md:grid-cols-12 md:items-center md:gap-10"
-              >
-                <div className="md:col-span-5 lg:col-span-4">
-                  <img
-                    src={service.image}
-                    alt=""
-                    className="aspect-[4/3] w-full object-cover"
-                  />
-                </div>
-                <div className="md:col-span-7 lg:col-span-8">
-                  <h3 className="font-[family-name:var(--font-display)] text-2xl font-medium tracking-tight text-ink md:text-3xl">
-                    {service.title}
-                  </h3>
-                  <p className="mt-4 max-w-[48ch] text-base font-light leading-relaxed text-ink-muted">
-                    {service.copy}
-                  </p>
-                </div>
-              </article>
-            ))}
-          </div>
-          <FramedInquire />
-        </div>
-      </section>
-    )
+  if (reduce || isMobile) {
+    return <AtelierStacked />
   }
 
   return (
@@ -347,16 +442,16 @@ function Atelier() {
           ))}
         </motion.div>
 
-        <div className="relative z-20 shrink-0 px-5 pb-8 pt-3 md:px-10 md:pb-10">
+        <div className="relative z-20 shrink-0 px-5 pb-6 pt-3 md:px-10 md:pb-10">
           <div className="mx-auto max-w-[1400px]">
             <div className="h-px w-full bg-bronze/20">
               <motion.div className="h-px bg-bronze" style={{ width: progressWidth }} />
             </div>
-            <div className="mt-3 flex flex-wrap gap-x-6 gap-y-2">
+            <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 md:gap-x-6">
               {services.map((service, index) => (
                 <span
                   key={service.title}
-                  className="font-[family-name:var(--font-body)] text-[10px] font-light uppercase tracking-[0.24em] text-ink/55"
+                  className="font-[family-name:var(--font-body)] text-[10px] font-light uppercase tracking-[0.2em] text-ink/55 md:tracking-[0.24em]"
                 >
                   0{index + 1} {service.title}
                 </span>
@@ -413,8 +508,36 @@ const atmospheres = [
   },
 ]
 
+function GalleryStacked() {
+  return (
+    <section id="gallery" className="bg-paper px-5 py-20 sm:py-24 md:px-10 md:py-36">
+      <div className="mx-auto max-w-[1100px]">
+        <h2 className="font-[family-name:var(--font-display)] text-[clamp(1.85rem,5vw,3.6rem)] font-medium text-ink">
+          Recent atmospheres
+        </h2>
+        <div className="mt-10 space-y-12 sm:mt-14 sm:space-y-16">
+          {atmospheres.map((item) => (
+            <article key={item.title}>
+              <img
+                src={item.src}
+                alt={item.alt}
+                className="aspect-[4/5] w-full object-cover sm:aspect-[16/10]"
+              />
+              <h3 className="mt-4 font-[family-name:var(--font-display)] text-xl text-ink sm:mt-5 sm:text-2xl">
+                {item.title}
+              </h3>
+              <p className="mt-2 max-w-[40ch] text-sm font-light text-ink-muted">{item.copy}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
 function Gallery() {
   const reduce = useReducedMotion()
+  const isMobile = useIsMobile()
   const sectionRef = useRef<HTMLElement>(null)
   const [active, setActive] = useState(0)
   const { scrollYProgress } = useScroll({
@@ -430,27 +553,8 @@ function Gallery() {
     setActive((current) => (current === next ? current : next))
   })
 
-  if (reduce) {
-    return (
-      <section id="gallery" className="bg-paper px-5 py-24 md:px-10 md:py-36">
-        <div className="mx-auto max-w-[1100px]">
-          <h2 className="font-[family-name:var(--font-display)] text-[clamp(2.2rem,5vw,3.6rem)] font-medium text-ink">
-            Recent atmospheres
-          </h2>
-          <div className="mt-14 space-y-16">
-            {atmospheres.map((item) => (
-              <article key={item.title}>
-                <img src={item.src} alt={item.alt} className="aspect-[16/10] w-full object-cover" />
-                <h3 className="mt-5 font-[family-name:var(--font-display)] text-2xl text-ink">
-                  {item.title}
-                </h3>
-                <p className="mt-2 max-w-[40ch] text-sm font-light text-ink-muted">{item.copy}</p>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-    )
+  if (reduce || isMobile) {
+    return <GalleryStacked />
   }
 
   const current = atmospheres[active]
@@ -1018,7 +1122,7 @@ function LeadForm() {
       <button
         type="submit"
         disabled={!canSubmit}
-        className="cursor-pointer border border-bronze/45 bg-bronze px-8 py-4 font-[family-name:var(--font-body)] text-[12px] font-normal uppercase tracking-[0.28em] text-paper transition-[filter,border-color] duration-200 hover:border-bronze hover:brightness-105 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:brightness-100"
+        className="w-full cursor-pointer border border-bronze/45 bg-bronze px-8 py-4 font-[family-name:var(--font-body)] text-[12px] font-normal uppercase tracking-[0.28em] text-paper transition-[filter,border-color] duration-200 hover:border-bronze hover:brightness-105 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:brightness-100 sm:w-auto"
       >
         Send inquiry
       </button>
@@ -1028,28 +1132,28 @@ function LeadForm() {
 
 function Inquire() {
   return (
-    <section id="inquire" className="bg-paper px-5 py-24 md:px-10 md:py-36">
+    <section id="inquire" className="bg-paper px-5 py-20 sm:py-24 md:px-10 md:py-36">
       <div className="mx-auto max-w-[1400px]">
         <Reveal>
-          <h2 className="max-w-[14ch] font-[family-name:var(--font-display)] text-[clamp(2rem,4vw,3.4rem)] font-medium leading-[1.1] text-ink">
+          <h2 className="max-w-[14ch] font-[family-name:var(--font-display)] text-[clamp(1.85rem,5vw,3.4rem)] font-medium leading-[1.1] text-ink">
             Tell us about the day
           </h2>
         </Reveal>
         <Reveal delay={0.08}>
-          <p className="mt-5 max-w-[48ch] text-base font-light leading-relaxed text-ink-muted">
+          <p className="mt-4 max-w-[48ch] text-sm font-light leading-relaxed text-ink-muted sm:mt-5 sm:text-base">
             Share a few details and we will reply with availability, next steps, and how we can
             shape the celebration with you.
           </p>
         </Reveal>
 
-        <div className="mt-12 grid lg:mt-16 lg:grid-cols-12 lg:items-stretch lg:gap-12">
-          <div className="relative hidden min-h-[520px] lg:col-span-5 lg:block">
+        <div className="mt-10 grid gap-8 lg:mt-16 lg:grid-cols-12 lg:items-stretch lg:gap-12">
+          <div className="relative aspect-[4/5] overflow-hidden lg:col-span-5 lg:aspect-auto lg:min-h-[520px]">
             <div className="absolute inset-0">
               <InquirePortraitReel />
             </div>
           </div>
           <div className="lg:col-span-7">
-            <div className="flex h-full flex-col justify-center border border-ink/15 bg-paper-deep px-5 py-8 md:px-8 md:py-10">
+            <div className="flex h-full flex-col justify-center border border-ink/15 bg-paper-deep px-4 py-6 sm:px-5 sm:py-8 md:px-8 md:py-10">
               <LeadForm />
             </div>
           </div>
@@ -1068,7 +1172,7 @@ function Footer() {
             <img
               src="/logo/logo-hero.png"
               alt="KV Creations"
-              className="h-[4.5rem] w-auto md:h-20"
+              className="h-14 w-auto sm:h-[4.5rem] md:h-20"
             />
           </a>
           <p className="mt-5 max-w-[28ch] text-sm font-light text-ink-muted">
