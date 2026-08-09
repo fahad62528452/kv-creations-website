@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import type { FirmProfile, LineItem, Party, StudioDocument, TaxMode } from './types'
 import { createLineItem } from './defaults'
 import { computeTotals, formatINR } from './gst'
@@ -164,7 +164,12 @@ export default function DocumentEditor({
   doc: StudioDocument
   onChange: (next: StudioDocument) => void
 }) {
+  const [panel, setPanel] = useState<'document' | 'inclusions'>('document')
   const totals = computeTotals(doc.items, doc.taxMode)
+  const inclusionCount = (doc.inclusions || '')
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean).length
 
   const patch = (partial: Partial<StudioDocument>) => {
     onChange({ ...doc, ...partial })
@@ -194,7 +199,72 @@ export default function DocumentEditor({
   }
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-8">
+      <div className="sticky top-[4.5rem] z-10 -mx-4 border-b border-bronze/15 bg-paper/95 px-4 py-3 backdrop-blur-md sm:-mx-6 sm:px-6 lg:mx-0 lg:px-0">
+        <p className="font-[family-name:var(--font-body)] text-[10px] font-light uppercase tracking-[0.28em] text-bronze">
+          Compose
+        </p>
+        <div className="mt-3 grid grid-cols-2 gap-2">
+          <button
+            type="button"
+            onClick={() => setPanel('document')}
+            className={`border px-3 py-3 text-left transition-colors ${
+              panel === 'document'
+                ? 'border-ink bg-ink text-paper'
+                : 'border-ink/15 text-ink/70 hover:border-bronze hover:text-bronze'
+            }`}
+          >
+            <span className="block font-[family-name:var(--font-body)] text-[10px] uppercase tracking-[0.22em]">
+              Page 1
+            </span>
+            <span className="mt-1 block font-[family-name:var(--font-display)] text-sm tracking-[0.04em]">
+              Invoice details
+            </span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setPanel('inclusions')}
+            className={`border px-3 py-3 text-left transition-colors ${
+              panel === 'inclusions'
+                ? 'border-ink bg-ink text-paper'
+                : 'border-ink/15 text-ink/70 hover:border-bronze hover:text-bronze'
+            }`}
+          >
+            <span className="block font-[family-name:var(--font-body)] text-[10px] uppercase tracking-[0.22em]">
+              Page 2
+            </span>
+            <span className="mt-1 block font-[family-name:var(--font-display)] text-sm tracking-[0.04em]">
+              Event inclusions
+              {inclusionCount > 0 ? ` (${inclusionCount})` : ''}
+            </span>
+          </button>
+        </div>
+      </div>
+
+      {panel === 'inclusions' ? (
+        <Section eyebrow="Event" title="What we provide">
+          <p className="mb-4 max-w-[48ch] font-[family-name:var(--font-body)] text-sm font-light leading-relaxed text-ink/55">
+            This is page 2 of the PDF. Enter one inclusion per line — decor,
+            coordination, guest flow, and anything else covered for the event.
+          </p>
+          <Field label="Inclusions (one per line)">
+            <textarea
+              className={`${textareaClass} min-h-[280px]`}
+              value={doc.inclusions || ''}
+              onChange={(e) => patch({ inclusions: e.target.value })}
+              rows={14}
+              autoFocus
+              placeholder={
+                'Full wedding planning & day-of coordination\nMandap & floral art direction\nGuest hospitality & seating flow\nVendor management\nReception atmosphere design'
+              }
+            />
+          </Field>
+          <p className="mt-4 font-[family-name:var(--font-body)] text-[11px] font-light text-ink/45">
+            Tip: switch to Preview to see page 2 update live.
+          </p>
+        </Section>
+      ) : (
+        <div className="space-y-10">
       <Section eyebrow="Document" title="Composition">
         <div className="flex flex-wrap gap-2">
           {(['quotation', 'invoice'] as const).map((type) => (
@@ -448,23 +518,6 @@ export default function DocumentEditor({
         </div>
       </Section>
 
-      <Section eyebrow="Event" title="What we provide">
-        <p className="mb-4 max-w-[48ch] font-[family-name:var(--font-body)] text-sm font-light leading-relaxed text-ink/55">
-          This becomes page 2 of the PDF. Enter one inclusion per line — decor, coordination, guest flow, and anything else covered for the event.
-        </p>
-        <Field label="Inclusions (one per line)">
-          <textarea
-            className={`${textareaClass} min-h-[180px]`}
-            value={doc.inclusions}
-            onChange={(e) => patch({ inclusions: e.target.value })}
-            rows={10}
-            placeholder={
-              'Full wedding planning & day-of coordination\nMandap & floral art direction\nGuest hospitality & seating flow\nVendor management\nReception atmosphere design'
-            }
-          />
-        </Field>
-      </Section>
-
       <Section eyebrow="Close" title="Notes & terms">
         <div className="grid gap-6">
           <Field label="Notes">
@@ -485,6 +538,21 @@ export default function DocumentEditor({
           </Field>
         </div>
       </Section>
+
+          <button
+            type="button"
+            onClick={() => setPanel('inclusions')}
+            className="w-full border border-bronze/40 bg-bronze/5 px-4 py-4 text-left transition-colors hover:border-bronze hover:bg-bronze/10"
+          >
+            <span className="font-[family-name:var(--font-body)] text-[10px] uppercase tracking-[0.28em] text-bronze">
+              Next · Page 2
+            </span>
+            <span className="mt-1 block font-[family-name:var(--font-display)] text-lg tracking-[0.04em] text-ink">
+              Add event inclusions
+            </span>
+          </button>
+        </div>
+      )}
     </div>
   )
 }
