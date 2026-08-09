@@ -6,6 +6,7 @@ import DocumentPreview from './DocumentPreview'
 import { downloadDocumentPdf } from './exportPdf'
 import PasswordGate from './PasswordGate'
 import {
+  cloudEnabled,
   deleteDraft,
   isStudioAuthed,
   loadActiveDocument,
@@ -27,14 +28,32 @@ function formatDraftLabel(doc: StudioDocument): string {
 
 function StudioWorkspace() {
   const [doc, setDoc] = useState<StudioDocument>(() => loadActiveDocument())
-  const [drafts, setDrafts] = useState<StudioDocument[]>(() => loadDrafts())
+  const [drafts, setDrafts] = useState<StudioDocument[]>([])
   const [showDrafts, setShowDrafts] = useState(false)
   const [savedFlash, setSavedFlash] = useState(false)
   const [pdfFlash, setPdfFlash] = useState('')
   const [mobileView, setMobileView] = useState<'compose' | 'preview'>('compose')
   const [exporting, setExporting] = useState(false)
   const [exportError, setExportError] = useState('')
+  const [syncLabel, setSyncLabel] = useState('')
   const printRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      const [nextDrafts, firm] = await Promise.all([loadDrafts(), loadFirm()])
+      if (cancelled) return
+      setDrafts(nextDrafts)
+      setDoc((current) => ({
+        ...current,
+        firm: current.firm.name ? current.firm : firm,
+      }))
+      setSyncLabel(cloudEnabled() ? 'Cloud sync on' : 'Local only')
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   useEffect(() => {
     saveActiveDocument(doc)
@@ -44,16 +63,17 @@ function StudioWorkspace() {
     setDoc(next)
   }
 
-  const saveDraft = () => {
-    const nextDrafts = upsertDraft(doc)
+  const saveDraft = async () => {
+    const nextDrafts = await upsertDraft(doc)
     setDrafts(nextDrafts)
-    saveFirm(doc.firm)
+    await saveFirm(doc.firm)
     setSavedFlash(true)
     window.setTimeout(() => setSavedFlash(false), 1800)
   }
 
-  const newDocument = (type: StudioDocument['type']) => {
-    const next = createDocument(type, doc.firm)
+  const newDocument = async (type: StudioDocument['type']) => {
+    const firm = doc.firm.name ? doc.firm : await loadFirm()
+    const next = createDocument(type, firm)
     setDoc(next)
     setMobileView('compose')
     setShowDrafts(false)
@@ -75,8 +95,8 @@ function StudioWorkspace() {
     setMobileView('compose')
   }
 
-  const removeDraft = (id: string) => {
-    setDrafts(deleteDraft(id))
+  const removeDraft = async (id: string) => {
+    setDrafts(await deleteDraft(id))
   }
 
   const downloadPdf = async () => {
@@ -127,7 +147,7 @@ function StudioWorkspace() {
             </Link>
             <div className="hidden sm:block">
               <p className="font-[family-name:var(--font-body)] text-[9px] font-light uppercase tracking-[0.32em] text-bronze">
-                Team studio
+                Team studio{syncLabel ? ` · ${syncLabel}` : ''}
               </p>
               <p className="font-[family-name:var(--font-display)] text-sm tracking-[0.12em] text-ink">
                 Quote & Invoice
@@ -341,8 +361,8 @@ export default function StudioPage() {
   const [authed, setAuthed] = useState(() => isStudioAuthed())
 
   useEffect(() => {
-    // Ensure firm seed exists for first visit after unlock
-    if (authed) loadFirm()
+    // Warm firm defaults after unlock
+    if (authed) void loadFirm()
   }, [authed])
 
   if (!authed) {
