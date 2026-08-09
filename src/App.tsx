@@ -388,7 +388,7 @@ function Atelier() {
     <section
       id="atelier"
       ref={sectionRef}
-      className="relative bg-paper-deep"
+      className="relative overflow-x-clip bg-paper-deep"
       style={{ height: `${services.length * 100}vh` }}
     >
       <div className="sticky top-0 flex h-dvh flex-col overflow-hidden">
@@ -573,7 +573,7 @@ function Gallery() {
     <section
       id="gallery"
       ref={sectionRef}
-      className="relative bg-paper"
+      className="relative overflow-x-clip bg-paper"
       style={{ height: `${atmospheres.length * 90}vh` }}
     >
       <div className="sticky top-0 h-dvh overflow-hidden">

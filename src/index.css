@@ -83,11 +83,10 @@ body {
   font-weight: 300;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  overflow-x: hidden;
 }
 
 #root {
-  overflow-x: hidden;
+  min-height: 100%;
 }
 
 ::selection {
