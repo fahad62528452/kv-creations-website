@@ -1,0 +1,323 @@
+/* Studio document preview + print styles */
+
+.studio-preview-frame {
+  overflow: auto;
+  border: 1px solid color-mix(in srgb, var(--color-bronze) 25%, transparent);
+  background:
+    linear-gradient(
+      145deg,
+      color-mix(in srgb, var(--color-paper-soft) 80%, white),
+      var(--color-paper-deep)
+    );
+  padding: 1rem;
+}
+
+@media (min-width: 640px) {
+  .studio-preview-frame {
+    padding: 1.5rem;
+  }
+}
+
+.studio-preview-scale {
+  display: flex;
+  justify-content: center;
+}
+
+.studio-sheet {
+  width: 210mm;
+  max-width: 100%;
+  min-height: 297mm;
+  background: #fffefb;
+  color: var(--color-ink);
+  padding: 14mm 14mm 16mm;
+  box-shadow:
+    0 1px 0 color-mix(in srgb, var(--color-bronze) 18%, transparent),
+    0 24px 48px color-mix(in srgb, var(--color-ink) 8%, transparent);
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: 10.5px;
+  line-height: 1.45;
+}
+
+@media (max-width: 900px) {
+  .studio-sheet {
+    width: 100%;
+    min-height: auto;
+    padding: 1.25rem;
+    box-shadow: none;
+  }
+}
+
+.studio-sheet-header {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-bronze) 35%, transparent);
+}
+
+.studio-sheet-brand {
+  display: flex;
+  gap: 0.85rem;
+  align-items: flex-start;
+}
+
+.studio-sheet-logo {
+  height: 48px;
+  width: auto;
+  flex-shrink: 0;
+}
+
+.studio-sheet-firm {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  margin: 0 0 0.35rem;
+}
+
+.studio-sheet-meta {
+  margin: 0.15rem 0 0;
+  color: color-mix(in srgb, var(--color-ink) 72%, transparent);
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.studio-sheet-docmeta {
+  text-align: right;
+}
+
+.studio-sheet-kicker {
+  margin: 0;
+  font-size: 9px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--color-bronze);
+}
+
+.studio-sheet-title {
+  margin: 0.35rem 0 0.75rem;
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+}
+
+.studio-sheet-dl {
+  margin: 0;
+  display: grid;
+  gap: 0.25rem;
+}
+
+.studio-sheet-dl > div {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.studio-sheet-dl dt {
+  color: color-mix(in srgb, var(--color-ink) 45%, transparent);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 8.5px;
+}
+
+.studio-sheet-dl dd {
+  margin: 0;
+  min-width: 7rem;
+  text-align: right;
+  font-weight: 400;
+}
+
+.studio-sheet-parties {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-bronze) 20%, transparent);
+}
+
+.studio-sheet-label {
+  margin: 0 0 0.35rem;
+  font-size: 8.5px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--color-bronze);
+}
+
+.studio-sheet-party-name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  font-weight: 500;
+}
+
+.studio-sheet-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.studio-sheet-table th,
+.studio-sheet-table td {
+  padding: 0.45rem 0.35rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-ink) 10%, transparent);
+  text-align: left;
+  vertical-align: top;
+}
+
+.studio-sheet-table th {
+  font-size: 8.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--color-ink) 55%, transparent);
+  font-weight: 400;
+  border-bottom-color: color-mix(in srgb, var(--color-bronze) 40%, transparent);
+}
+
+.studio-sheet-table .num,
+.studio-sheet-taxbreak .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.studio-sheet-totals {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 1rem;
+  margin-top: 1.1rem;
+  padding-top: 0.75rem;
+}
+
+.studio-sheet-words p:last-child {
+  margin: 0.25rem 0 0;
+  font-family: var(--font-display);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  line-height: 1.5;
+}
+
+.studio-sheet-sum {
+  margin: 0;
+}
+
+.studio-sheet-sum > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.2rem 0;
+}
+
+.studio-sheet-sum dt {
+  color: color-mix(in srgb, var(--color-ink) 55%, transparent);
+}
+
+.studio-sheet-sum dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.studio-sheet-sum .grand {
+  margin-top: 0.35rem;
+  padding-top: 0.45rem;
+  border-top: 1px solid color-mix(in srgb, var(--color-bronze) 45%, transparent);
+  font-family: var(--font-display);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+}
+
+.studio-sheet-taxbreak {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.85rem;
+  font-size: 9.5px;
+}
+
+.studio-sheet-taxbreak th,
+.studio-sheet-taxbreak td {
+  padding: 0.3rem 0.25rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-ink) 8%, transparent);
+  text-align: left;
+}
+
+.studio-sheet-taxbreak th {
+  font-size: 8px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--color-ink) 50%, transparent);
+  font-weight: 400;
+}
+
+.studio-sheet-bank,
+.studio-sheet-notes {
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid color-mix(in srgb, var(--color-bronze) 18%, transparent);
+}
+
+.studio-sheet-notes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.studio-sheet-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem;
+  margin-top: 1.75rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid color-mix(in srgb, var(--color-bronze) 25%, transparent);
+  color: color-mix(in srgb, var(--color-ink) 45%, transparent);
+  font-size: 9px;
+}
+
+.studio-sheet-sign {
+  margin: 0;
+  min-width: 8rem;
+  text-align: right;
+  border-top: 1px solid color-mix(in srgb, var(--color-ink) 25%, transparent);
+  padding-top: 0.35rem;
+  color: var(--color-ink);
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 10mm;
+  }
+
+  html,
+  body {
+    background: white !important;
+    overflow: visible !important;
+  }
+
+  body.studio-printing * {
+    visibility: hidden;
+  }
+
+  body.studio-printing #studio-print-sheet,
+  body.studio-printing #studio-print-sheet * {
+    visibility: visible;
+  }
+
+  body.studio-printing #studio-print-sheet {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 190mm;
+    min-height: auto;
+    margin: 0;
+    padding: 0;
+    box-shadow: none;
+    border: none;
+  }
+
+  .studio-no-print,
+  .grain {
+    display: none !important;
+  }
+}
