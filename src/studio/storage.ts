@@ -1,4 +1,4 @@
-import { createDocument, FIRM_DEFAULT } from './defaults'
+import { createDocument, FIRM_DEFAULT, normalizeDocument } from './defaults'
 import type { FirmProfile, StudioDocument } from './types'
 
 const FIRM_KEY = 'kv-studio-firm'
@@ -25,7 +25,7 @@ export function loadDrafts(): StudioDocument[] {
     const raw = localStorage.getItem(DRAFTS_KEY)
     if (!raw) return []
     const parsed = JSON.parse(raw) as StudioDocument[]
-    return Array.isArray(parsed) ? parsed : []
+    return Array.isArray(parsed) ? parsed.map(normalizeDocument) : []
   } catch {
     return []
   }
@@ -54,7 +54,7 @@ export function deleteDraft(id: string): StudioDocument[] {
 export function loadActiveDocument(): StudioDocument {
   try {
     const raw = localStorage.getItem(ACTIVE_KEY)
-    if (raw) return JSON.parse(raw) as StudioDocument
+    if (raw) return normalizeDocument(JSON.parse(raw) as StudioDocument)
   } catch {
     /* fall through */
   }

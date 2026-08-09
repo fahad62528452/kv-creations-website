@@ -84,11 +84,31 @@ export function createDocument(
         gstRate: 18,
       }),
     ],
+    inclusions: '',
     notes: 'Thank you for choosing KV Creations.',
     terms:
       type === 'quotation'
         ? 'This quotation is valid until the date shown. Fifty percent advance confirms the booking. Balance due as per the final invoice.'
         : 'Payment due by the date shown. Please mention the invoice number in the transfer reference.',
     updatedAt: new Date().toISOString(),
+  }
+}
+
+export function inclusionLines(text: string | undefined): string[] {
+  if (!text) return []
+  return text
+    .split(/\r?\n/)
+    .map((line) => line.replace(/^[-•*\d.)\s]+/, '').trim())
+    .filter(Boolean)
+}
+
+export function normalizeDocument(doc: StudioDocument): StudioDocument {
+  return {
+    ...createDocument(doc.type),
+    ...doc,
+    inclusions: doc.inclusions ?? '',
+    firm: { ...FIRM_DEFAULT, ...doc.firm },
+    client: { ...EMPTY_CLIENT, ...doc.client },
+    items: doc.items?.length ? doc.items : createDocument(doc.type).items,
   }
 }

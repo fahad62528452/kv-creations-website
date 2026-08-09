@@ -448,6 +448,23 @@ export default function DocumentEditor({
         </div>
       </Section>
 
+      <Section eyebrow="Event" title="What we provide">
+        <p className="mb-4 max-w-[48ch] font-[family-name:var(--font-body)] text-sm font-light leading-relaxed text-ink/55">
+          This becomes page 2 of the PDF. Enter one inclusion per line — decor, coordination, guest flow, and anything else covered for the event.
+        </p>
+        <Field label="Inclusions (one per line)">
+          <textarea
+            className={`${textareaClass} min-h-[180px]`}
+            value={doc.inclusions}
+            onChange={(e) => patch({ inclusions: e.target.value })}
+            rows={10}
+            placeholder={
+              'Full wedding planning & day-of coordination\nMandap & floral art direction\nGuest hospitality & seating flow\nVendor management\nReception atmosphere design'
+            }
+          />
+        </Field>
+      </Section>
+
       <Section eyebrow="Close" title="Notes & terms">
         <div className="grid gap-6">
           <Field label="Notes">

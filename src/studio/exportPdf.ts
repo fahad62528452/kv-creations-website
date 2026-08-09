@@ -1,3 +1,4 @@
+import { inclusionLines } from './defaults'
 import { amountInWords, computeTotals, formatINRPlain, lineTaxable } from './gst'
 import type { StudioDocument } from './types'
 
@@ -25,7 +26,7 @@ function formatDisplayDate(iso: string): string {
 
 async function loadLogoDataUrl(): Promise<string | null> {
   try {
-    const res = await fetch('/logo/logo-hero.png')
+    const res = await fetch('/logo/logo-invoice.jpg')
     if (!res.ok) return null
     const blob = await res.blob()
     return await new Promise((resolve, reject) => {
@@ -84,7 +85,7 @@ export async function downloadDocumentPdf(doc: StudioDocument): Promise<string> 
   const logo = await loadLogoDataUrl()
   if (logo) {
     try {
-      pdf.addImage(logo, 'PNG', MARGIN, y, 16, 16)
+      pdf.addImage(logo, 'JPEG', MARGIN, y, 18, 18)
     } catch {
       /* logo optional */
     }
@@ -93,7 +94,7 @@ export async function downloadDocumentPdf(doc: StudioDocument): Promise<string> 
   pdf.setTextColor(...ink)
   pdf.setFont('times', 'bold')
   pdf.setFontSize(13)
-  pdf.text(doc.firm.name || 'KV Creations', MARGIN + (logo ? 20 : 0), y + 6)
+  pdf.text(doc.firm.name || 'KV Creations', MARGIN + (logo ? 22 : 0), y + 6)
 
   pdf.setFont('helvetica', 'normal')
   pdf.setFontSize(8)
@@ -110,7 +111,7 @@ export async function downloadDocumentPdf(doc: StudioDocument): Promise<string> 
   let firmY = y + 11
   for (const line of firmLines) {
     const wrapped = pdf.splitTextToSize(line, 95)
-    pdf.text(wrapped, MARGIN + (logo ? 20 : 0), firmY)
+    pdf.text(wrapped, MARGIN + (logo ? 22 : 0), firmY)
     firmY += wrapped.length * 3.6
   }
 
@@ -384,7 +385,7 @@ export async function downloadDocumentPdf(doc: StudioDocument): Promise<string> 
     y = Math.max(notesBottom, termsBottom) + 4
   }
 
-  // Footer
+  // Footer page 1
   ensureSpace(18)
   y = Math.max(y + 6, PAGE_H - MARGIN - 14)
   drawRule()
@@ -393,6 +394,96 @@ export async function downloadDocumentPdf(doc: StudioDocument): Promise<string> 
   pdf.setFontSize(7.5)
   pdf.setTextColor(...muted)
   pdf.text('This is a computer-generated document from KV Creations.', MARGIN, y)
+  pdf.setTextColor(...ink)
+  pdf.text('Authorised signatory', PAGE_W - MARGIN, y, { align: 'right' })
+
+  // Page 2 — event inclusions
+  const inclusions = inclusionLines(doc.inclusions)
+  pdf.addPage()
+  y = MARGIN
+
+  if (logo) {
+    try {
+      pdf.addImage(logo, 'JPEG', MARGIN, y, 18, 18)
+    } catch {
+      /* optional */
+    }
+  }
+  pdf.setTextColor(...ink)
+  pdf.setFont('times', 'bold')
+  pdf.setFontSize(13)
+  pdf.text(doc.firm.name || 'KV Creations', MARGIN + (logo ? 22 : 0), y + 6)
+
+  pdf.setTextColor(...bronze)
+  pdf.setFont('helvetica', 'normal')
+  pdf.setFontSize(8)
+  pdf.text('KV CREATIONS', PAGE_W - MARGIN, y + 4, { align: 'right' })
+  pdf.setTextColor(...ink)
+  pdf.setFont('times', 'bold')
+  pdf.setFontSize(16)
+  pdf.text('EVENT INCLUSIONS', PAGE_W - MARGIN, y + 12, { align: 'right' })
+
+  pdf.setFont('helvetica', 'normal')
+  pdf.setFontSize(8)
+  pdf.setTextColor(...muted)
+  pdf.text(`No.  ${doc.number || '—'}`, PAGE_W - MARGIN, y + 18, { align: 'right' })
+  pdf.text(`Date  ${formatDisplayDate(doc.date)}`, PAGE_W - MARGIN, y + 22, {
+    align: 'right',
+  })
+
+  y = MARGIN + 28
+  drawRule()
+  y += 8
+
+  pdf.setTextColor(...ink)
+  pdf.setFont('helvetica', 'normal')
+  pdf.setFontSize(9)
+  const intro = `The following is included in this ${
+    doc.type === 'invoice' ? 'engagement' : 'quotation'
+  }${doc.client.name ? ` for ${doc.client.name}` : ''}.`
+  const introLines = pdf.splitTextToSize(intro, CONTENT_W)
+  pdf.text(introLines, MARGIN, y)
+  y += introLines.length * 4.2 + 6
+
+  if (inclusions.length === 0) {
+    pdf.setTextColor(...muted)
+    pdf.setFontSize(8)
+    pdf.text(
+      'Add inclusions in the studio editor. Each line becomes an item on this page.',
+      MARGIN,
+      y,
+    )
+  } else {
+    inclusions.forEach((line, index) => {
+      const wrapped = pdf.splitTextToSize(line, CONTENT_W - 14)
+      const rowH = Math.max(wrapped.length * 4.2, 6)
+      if (y + rowH > PAGE_H - MARGIN - 16) {
+        pdf.addPage()
+        y = MARGIN
+      }
+      pdf.setFont('times', 'bold')
+      pdf.setFontSize(9)
+      pdf.setTextColor(...bronze)
+      pdf.text(String(index + 1).padStart(2, '0'), MARGIN, y)
+      pdf.setFont('helvetica', 'normal')
+      pdf.setFontSize(9.5)
+      pdf.setTextColor(...ink)
+      pdf.text(wrapped, MARGIN + 12, y)
+      y += rowH
+      pdf.setDrawColor(...rule)
+      pdf.setLineWidth(0.2)
+      pdf.line(MARGIN, y - 1.5, PAGE_W - MARGIN, y - 1.5)
+      y += 2.5
+    })
+  }
+
+  y = Math.max(y + 8, PAGE_H - MARGIN - 14)
+  drawRule()
+  y += 5
+  pdf.setFont('helvetica', 'normal')
+  pdf.setFontSize(7.5)
+  pdf.setTextColor(...muted)
+  pdf.text('Page 2 · KV Creations event inclusions', MARGIN, y)
   pdf.setTextColor(...ink)
   pdf.text('Authorised signatory', PAGE_W - MARGIN, y, { align: 'right' })
 

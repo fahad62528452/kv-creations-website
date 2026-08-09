@@ -1,6 +1,9 @@
 import type { RefObject } from 'react'
+import { inclusionLines } from './defaults'
 import { amountInWords, computeTotals, formatINRPlain, lineTaxable } from './gst'
 import type { StudioDocument } from './types'
+
+const INVOICE_LOGO = '/logo/logo-invoice.jpg'
 
 function formatDisplayDate(iso: string): string {
   if (!iso) return '—'
@@ -11,6 +14,65 @@ function formatDisplayDate(iso: string): string {
     month: 'short',
     year: 'numeric',
   })
+}
+
+function SheetHeader({
+  doc,
+  title,
+}: {
+  doc: StudioDocument
+  title: string
+}) {
+  return (
+    <header className="studio-sheet-header">
+      <div className="studio-sheet-brand">
+        <img src={INVOICE_LOGO} alt="" className="studio-sheet-logo" />
+        <div>
+          <p className="studio-sheet-firm">{doc.firm.name || 'KV Creations'}</p>
+          {doc.firm.address && (
+            <p className="studio-sheet-meta whitespace-pre-line">{doc.firm.address}</p>
+          )}
+          <p className="studio-sheet-meta">
+            {[doc.firm.phone, doc.firm.email].filter(Boolean).join(' · ')}
+          </p>
+          {doc.firm.gstin && (
+            <p className="studio-sheet-meta">GSTIN: {doc.firm.gstin}</p>
+          )}
+        </div>
+      </div>
+      <div className="studio-sheet-docmeta">
+        <p className="studio-sheet-kicker">KV Creations</p>
+        <h1 className="studio-sheet-title">{title}</h1>
+        <dl className="studio-sheet-dl">
+          <div>
+            <dt>No.</dt>
+            <dd>{doc.number || '—'}</dd>
+          </div>
+          <div>
+            <dt>Date</dt>
+            <dd>{formatDisplayDate(doc.date)}</dd>
+          </div>
+          {doc.type === 'quotation' ? (
+            <div>
+              <dt>Valid until</dt>
+              <dd>{formatDisplayDate(doc.validUntil)}</dd>
+            </div>
+          ) : (
+            <div>
+              <dt>Due date</dt>
+              <dd>{formatDisplayDate(doc.dueDate)}</dd>
+            </div>
+          )}
+          {doc.placeOfSupply && (
+            <div>
+              <dt>Place of supply</dt>
+              <dd>{doc.placeOfSupply}</dd>
+            </div>
+          )}
+        </dl>
+      </div>
+    </header>
+  )
 }
 
 export default function DocumentPreview({
@@ -25,58 +87,12 @@ export default function DocumentPreview({
   const showBank =
     doc.type === 'invoice' &&
     (doc.firm.bankName || doc.firm.accountNumber || doc.firm.upi)
+  const inclusions = inclusionLines(doc.inclusions)
 
   return (
-    <div className="studio-preview-scale">
-      <div ref={printRef} className="studio-sheet" id="studio-print-sheet">
-        <header className="studio-sheet-header">
-          <div className="studio-sheet-brand">
-            <img src="/logo/logo-hero.png" alt="" className="studio-sheet-logo" />
-            <div>
-              <p className="studio-sheet-firm">{doc.firm.name || 'KV Creations'}</p>
-              {doc.firm.address && (
-                <p className="studio-sheet-meta whitespace-pre-line">{doc.firm.address}</p>
-              )}
-              <p className="studio-sheet-meta">
-                {[doc.firm.phone, doc.firm.email].filter(Boolean).join(' · ')}
-              </p>
-              {doc.firm.gstin && (
-                <p className="studio-sheet-meta">GSTIN: {doc.firm.gstin}</p>
-              )}
-            </div>
-          </div>
-          <div className="studio-sheet-docmeta">
-            <p className="studio-sheet-kicker">KV Creations</p>
-            <h1 className="studio-sheet-title">{title}</h1>
-            <dl className="studio-sheet-dl">
-              <div>
-                <dt>No.</dt>
-                <dd>{doc.number || '—'}</dd>
-              </div>
-              <div>
-                <dt>Date</dt>
-                <dd>{formatDisplayDate(doc.date)}</dd>
-              </div>
-              {doc.type === 'quotation' ? (
-                <div>
-                  <dt>Valid until</dt>
-                  <dd>{formatDisplayDate(doc.validUntil)}</dd>
-                </div>
-              ) : (
-                <div>
-                  <dt>Due date</dt>
-                  <dd>{formatDisplayDate(doc.dueDate)}</dd>
-                </div>
-              )}
-              {doc.placeOfSupply && (
-                <div>
-                  <dt>Place of supply</dt>
-                  <dd>{doc.placeOfSupply}</dd>
-                </div>
-              )}
-            </dl>
-          </div>
-        </header>
+    <div ref={printRef} className="studio-preview-scale studio-preview-stack">
+      <div className="studio-sheet" id="studio-print-sheet">
+        <SheetHeader doc={doc} title={title} />
 
         <section className="studio-sheet-parties">
           <div>
@@ -245,6 +261,37 @@ export default function DocumentPreview({
 
         <footer className="studio-sheet-footer">
           <p>This is a computer-generated document from KV Creations.</p>
+          <p className="studio-sheet-sign">Authorised signatory</p>
+        </footer>
+      </div>
+
+      <div className="studio-sheet studio-sheet-page2">
+        <SheetHeader doc={doc} title="Event inclusions" />
+
+        <p className="studio-sheet-page2-intro">
+          The following is included in this {doc.type === 'invoice' ? 'engagement' : 'quotation'}
+          {doc.client.name ? ` for ${doc.client.name}` : ''}.
+        </p>
+
+        {inclusions.length > 0 ? (
+          <ol className="studio-sheet-inclusions">
+            {inclusions.map((line, index) => (
+              <li key={`${index}-${line}`}>
+                <span className="studio-sheet-inclusion-index">
+                  {String(index + 1).padStart(2, '0')}
+                </span>
+                <span>{line}</span>
+              </li>
+            ))}
+          </ol>
+        ) : (
+          <p className="studio-sheet-meta studio-sheet-page2-empty">
+            Add inclusions in the editor. Each line becomes an item on this page.
+          </p>
+        )}
+
+        <footer className="studio-sheet-footer">
+          <p>Page 2 · KV Creations event inclusions</p>
           <p className="studio-sheet-sign">Authorised signatory</p>
         </footer>
       </div>

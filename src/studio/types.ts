@@ -42,6 +42,8 @@ export type StudioDocument = {
   firm: FirmProfile
   client: Party
   items: LineItem[]
+  /** Page 2: what KV provides for the event (one item per line) */
+  inclusions: string
   notes: string
   terms: string
   updatedAt: string
