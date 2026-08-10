@@ -9,6 +9,7 @@ import {
   useTransform,
 } from 'framer-motion'
 import Lenis from 'lenis'
+import { founders } from './data/founders'
 
 function useIsMobile(query = '(max-width: 767px)') {
   const [isMobile, setIsMobile] = useState(() =>
@@ -88,6 +89,7 @@ function Reveal({
 }
 
 const navLinks = [
+  ['Founders', '#founders'],
   ['Story', '#story'],
   ['Atelier', '#atelier'],
   ['Gallery', '#gallery'],
@@ -269,6 +271,50 @@ function BeginStoryLink() {
         →
       </span>
     </a>
+  )
+}
+
+function FoundersPreview() {
+  const founder = founders[0]
+
+  return (
+    <section id="founders" className="relative bg-paper-deep px-5 py-20 sm:py-24 md:px-10 md:py-32">
+      <div className="mx-auto grid max-w-[1400px] items-center gap-10 lg:grid-cols-12 lg:gap-16">
+        <div className="relative lg:col-span-6">
+          <div className="overflow-hidden">
+            <img
+              src={founder.portrait}
+              alt={founder.portraitAlt}
+              className="aspect-[4/5] w-full object-cover object-[center_22%] sm:aspect-[5/6]"
+            />
+          </div>
+        </div>
+        <div className="lg:col-span-6">
+          <p className="font-[family-name:var(--font-body)] text-[10px] font-light uppercase tracking-[0.32em] text-bronze">
+            Founders
+          </p>
+          <h2 className="mt-4 max-w-[14ch] font-[family-name:var(--font-display)] text-[clamp(1.85rem,4vw,3.2rem)] font-medium leading-[1.08] tracking-tight text-ink">
+            {founder.headline}
+          </h2>
+          <p className="mt-6 font-[family-name:var(--font-display)] text-lg tracking-tight text-ink md:text-xl">
+            {founder.name}
+          </p>
+          <p className="mt-2 font-[family-name:var(--font-body)] text-[11px] font-light uppercase tracking-[0.28em] text-ink-muted">
+            {founder.role}
+          </p>
+          <p className="mt-6 max-w-[42ch] font-[family-name:var(--font-body)] text-base font-light leading-relaxed text-ink-muted md:text-lg">
+            {founder.summary} No two stories are alike. Neither should be the
+            celebrations that tell them.
+          </p>
+          <Link
+            to="/founders"
+            className="mt-9 inline-flex border border-bronze/45 px-8 py-4 font-[family-name:var(--font-body)] text-[11px] font-light uppercase tracking-[0.28em] text-bronze transition-colors duration-300 hover:border-bronze hover:bg-bronze/10 hover:text-bronze-bright"
+          >
+            Meet the founders
+          </Link>
+        </div>
+      </div>
+    </section>
   )
 }
 
@@ -1201,15 +1247,74 @@ function Footer() {
   )
 }
 
+function IntroSplash({ onComplete }: { onComplete: () => void }) {
+  const reduce = useReducedMotion()
+  const [exiting, setExiting] = useState(false)
+
+  useEffect(() => {
+    if (reduce) {
+      onComplete()
+      return
+    }
+
+    document.body.style.overflow = 'hidden'
+    // Hold the mark, then slowly dissolve into the site
+    const exitAt = window.setTimeout(() => setExiting(true), 1400)
+    const doneAt = window.setTimeout(() => {
+      document.body.style.overflow = ''
+      onComplete()
+    }, 4200)
+
+    return () => {
+      window.clearTimeout(exitAt)
+      window.clearTimeout(doneAt)
+      document.body.style.overflow = ''
+    }
+  }, [reduce, onComplete])
+
+  if (reduce) return null
+
+  return (
+    <motion.div
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-white"
+      initial={{ opacity: 1 }}
+      animate={{ opacity: exiting ? 0 : 1 }}
+      transition={{ duration: 2.6, ease: [0.22, 0.61, 0.36, 1] }}
+      aria-hidden
+    >
+      <motion.img
+        src="/logo/logo-intro.png"
+        alt=""
+        className="h-auto w-[min(78vw,320px)] select-none will-change-[filter,opacity,transform]"
+        initial={{ opacity: 0, scale: 0.96, filter: 'blur(0px)' }}
+        animate={
+          exiting
+            ? { opacity: 0, scale: 1.1, filter: 'blur(36px)' }
+            : { opacity: 1, scale: 1, filter: 'blur(0px)' }
+        }
+        transition={
+          exiting
+            ? { duration: 2.6, ease: [0.22, 0.61, 0.36, 1] }
+            : { duration: 0.85, ease: [0.22, 1, 0.36, 1] }
+        }
+        draggable={false}
+      />
+    </motion.div>
+  )
+}
+
 export default function App() {
   useSmoothScroll()
+  const [introDone, setIntroDone] = useState(false)
 
   return (
     <>
+      {!introDone && <IntroSplash onComplete={() => setIntroDone(true)} />}
       <div className="grain" aria-hidden />
       <Nav />
       <main>
         <Hero />
+        <FoundersPreview />
         <Story />
         <Atelier />
         <Gallery />
